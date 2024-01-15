@@ -1,2 +1,2 @@
 # PyPaint
-A simple paint app using pygame and python
+A simple app using pygame and python to play with some colors
