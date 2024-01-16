@@ -15,13 +15,11 @@ class GridCanvas:
         self.cells : Set[Tuple[int, int, str]] = set()
 
     def paint_cell(self : "GraphCanvas", color : str, pos : Tuple[int], surface : "pygame.surface.Surface") -> None:
-        col = ((pos[0]) // GridCanvas.__DEFAULT_GRID_SIZE) - (GridCanvas.__XOFFSET // GridCanvas.__DEFAULT_GRID_SIZE)
-        row = ((pos[1]) // GridCanvas.__DEFAULT_GRID_SIZE) - ((GridCanvas.__YOFFSET + 12) // GridCanvas.__DEFAULT_GRID_SIZE)
+        col, row = self.get_coord(pos)
         entry = (col, row, color)
         
-        if not (GridCanvas.__XOFFSET <= pos[0] < ((GridCanvas.__DEFAULT_GRID_WH[0] * GridCanvas.__DEFAULT_GRID_SIZE) + GridCanvas.__XOFFSET)
-            and (GridCanvas.__YOFFSET) <= pos[1] <= (GridCanvas.__DEFAULT_GRID_WH[1] * GridCanvas.__DEFAULT_GRID_SIZE) + (GridCanvas.__YOFFSET + 12)):
-                    return
+        if col == -1 or row == -1:
+            return
 
         if entry not in self.cells:
             self.cells.add(entry)
@@ -35,12 +33,10 @@ class GridCanvas:
         self.draw_in(surface)
 
     def clear_cell(self : "GraphCanvas", pos : Tuple[int], eraseColor : Tuple[int], surface : "pygame.surface.Surface") -> None:
-        if not (GridCanvas.__XOFFSET <= pos[0] < ((GridCanvas.__DEFAULT_GRID_WH[0] * GridCanvas.__DEFAULT_GRID_SIZE) + GridCanvas.__XOFFSET)
-            and (GridCanvas.__YOFFSET) <= pos[1] <= (GridCanvas.__DEFAULT_GRID_WH[1] * GridCanvas.__DEFAULT_GRID_SIZE) + (GridCanvas.__YOFFSET + 12)):
-                    return
+        col, row = self.get_coord(pos)
 
-        col = ((pos[0]) // GridCanvas.__DEFAULT_GRID_SIZE) - (GridCanvas.__XOFFSET // GridCanvas.__DEFAULT_GRID_SIZE)
-        row = ((pos[1]) // GridCanvas.__DEFAULT_GRID_SIZE) - ((GridCanvas.__YOFFSET + 12) // GridCanvas.__DEFAULT_GRID_SIZE)
+        if col == -1 or row == -1:
+            return
         
         for __col, __row, color in self.cells:
             if __row == row and __col == col:
@@ -86,6 +82,20 @@ class GridCanvas:
             GridCanvas.__CORE__.draw.rect(canvas, color, (*topLeft, 1, 1))
 
         return canvas
+
+    def get_coord(self : "GraphCanvas", pos : Tuple[int]) -> Tuple[int]:
+        coord = (-1, -1)
+        if not (GridCanvas.__XOFFSET <= pos[0] < ((GridCanvas.__DEFAULT_GRID_WH[0] * GridCanvas.__DEFAULT_GRID_SIZE) + GridCanvas.__XOFFSET)
+            and (GridCanvas.__YOFFSET) <= pos[1] <= (GridCanvas.__DEFAULT_GRID_WH[1] * GridCanvas.__DEFAULT_GRID_SIZE) + (GridCanvas.__YOFFSET + 12)):
+                    return coord
+
+        col = ((pos[0]) // GridCanvas.__DEFAULT_GRID_SIZE) - (GridCanvas.__XOFFSET // GridCanvas.__DEFAULT_GRID_SIZE)
+        row = ((pos[1]) // GridCanvas.__DEFAULT_GRID_SIZE) - ((GridCanvas.__YOFFSET + 12) // GridCanvas.__DEFAULT_GRID_SIZE)
+
+        coord = (col, row)
+
+        return coord
+
 
     def export_png(self) -> None:
         fileName : str = f"pypaint_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png"
