@@ -82,6 +82,7 @@ class App():
         if self.activeEraseState:
             self.gridCanvas.clear_cell(event.dict["pos"], App.__DEFAULT_WINDOW_COLOR, self.__MAIN_SURFACE)
 
+    def __give_coord_hint(self : "App", event : "pygame.event.Event") -> None:
         col, row = self.gridCanvas.get_coord(event.dict["pos"])
         if col == -1 or row == -1:
             col = '--'
@@ -104,6 +105,9 @@ class App():
         if event.type == App.__CORE__.MOUSEMOTION and event.buttons[0]:
             self.__execute_action(event)
 
+        if event.type == App.__CORE__.MOUSEMOTION:
+            self.__give_coord_hint(event)
+
     def run(self : "App") -> None:
         while True:
             for event in App.__CORE__.event.get():
@@ -115,7 +119,7 @@ class App():
             self.__MAIN_SURFACE.blit(self.saveButtonSurface, self.saveButtonPosRect)
             self.__MAIN_SURFACE.blit(self.posIndicatorText, self.posInicatorRect)
             self.__WINDOW.flip()
-            self.__WINDOW.update()
+            self.__WINDOW.update()      
 
 
 if __name__ == "__main__":
