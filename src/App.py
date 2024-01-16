@@ -47,6 +47,9 @@ class App():
         self.gridCanvas.draw_in(self.__MAIN_SURFACE)
 
     def __check_for_tool_selection(self : "App", pos : Tuple[int]) -> None:
+        if self.saveButtonPosRect.collidepoint(pos):
+            self.gridCanvas.export_png()
+        
         if self.drawButtonPosRect.collidepoint(pos):
             self.activeDrawSate = not self.activeDrawSate
             if self.activeDrawSate:
@@ -69,13 +72,11 @@ class App():
     def __execute_action(self : "App", event : "pygame.event.Event") -> None:
         color = self.colorPlate.get_selected_color()
         if color and self.activeDrawSate:
-            if (200 <= event.dict["pos"][0] <= 1250 and 60 <= event.dict["pos"][1] <= 750):
-                color[1].center = event.dict["pos"]
-                self.gridCanvas.paint_cell(color[0], event.dict["pos"], self.__MAIN_SURFACE)
+            color[1].center = event.dict["pos"]
+            self.gridCanvas.paint_cell(color[0], event.dict["pos"], self.__MAIN_SURFACE)
 
         if self.activeEraseState:
-            if (200 <= event.dict["pos"][0] <= 1250 and 60 <= event.dict["pos"][1] <= 750):
-                self.gridCanvas.clear_cell(event.dict["pos"], App.__DEFAULT_WINDOW_COLOR, self.__MAIN_SURFACE)
+            self.gridCanvas.clear_cell(event.dict["pos"], App.__DEFAULT_WINDOW_COLOR, self.__MAIN_SURFACE)
 
     def __handle_event(self : "App", event : "pygame.event.Event") -> None:
         if event.type == App.__CORE__.QUIT:
