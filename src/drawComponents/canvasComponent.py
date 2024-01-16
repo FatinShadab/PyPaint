@@ -62,6 +62,11 @@ class GridCanvas:
            GridCanvas.__CORE__.draw.line(surface, "black", startPoint, endPoint)
 
     def __send_notification(self : "GraphCanvas", fileInfo : str) -> None:
+        if os.name == "nt":
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(0, f"File saved at : {fileInfo}", "PYPAINT : Drawing saved !", 1)
+            return
+            
         notification.notify(
             title="PYPAINT : Drawing saved !",
             message=f"File saved at : {fileInfo}",
