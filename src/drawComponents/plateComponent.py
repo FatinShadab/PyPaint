@@ -36,9 +36,9 @@ class ColorPlate:
     def mark_selected_color(self : "ColorPlate", surface : "pygame.surface.Surface") -> None:
         if self.selectedColor:
             _, selectedRect = self.get_selected_color()
-            selectedRect.width -= 20
-            selectedRect.height -= 20
-            ColorPlate.__CORE__.draw.rect(surface, "black", selectedRect)
+            selectedRect.width -= 15
+            selectedRect.height -= 15
+            ColorPlate.__CORE__.draw.rect(surface, "black" if self.selectedColor.lower() != "black" else "white", selectedRect)
 
     def get_selected_color(self : "ColorPlate") -> Optional[Tuple[str, "pygame.Rect"]]:
         if self.selectedColor:
