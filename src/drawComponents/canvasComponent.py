@@ -1,3 +1,4 @@
+import os
 import pygame
 from typing import Tuple, Set
 from datetime import datetime
@@ -68,18 +69,24 @@ class GridCanvas:
             timeout=30,  # Display duration in seconds
         )
 
-    def __get_drawing_for_export(self: "GraphCanvas") -> "pygame.surface.Surface":
-        canvas = GridCanvas.__CORE__.surface.Surface(GridCanvas.__DEFAULT_GRID_WH)
+    def __get_drawing_for_export(self: "GraphCanvas", scale : int) -> "pygame.surface.Surface":
+        canvas_size = (GridCanvas.__DEFAULT_GRID_WH[0] * scale, GridCanvas.__DEFAULT_GRID_WH[1] * scale)
+        canvas = GridCanvas.__CORE__.surface.Surface(canvas_size)
+
+        # Enable anti-aliasing
+        canvas.set_alpha(None)
 
         for row in range(GridCanvas.__DEFAULT_GRID_WH[0]):
             for col in range(GridCanvas.__DEFAULT_GRID_WH[1]):
-                GridCanvas.__CORE__.draw.rect(canvas, (0, 0, 0, 0),
-                    (col, row, 1, 1))
+                pixel_size = scale * 1
+                pixel_color = "white"
+                pixel_rect = (col * pixel_size, row * pixel_size, pixel_size, pixel_size)
+                GridCanvas.__CORE__.draw.rect(canvas, pixel_color, pixel_rect, 0)  # Set the third argument to 0 for no anti-aliasing
 
         for col, row, color in self.cells:
-            print(col, row)
-            topLeft = (col, row)
-            GridCanvas.__CORE__.draw.rect(canvas, color, (*topLeft, 1, 1))
+            pixel_size = scale * 1
+            pixel_rect = (col * pixel_size, row * pixel_size, pixel_size, pixel_size)
+            GridCanvas.__CORE__.draw.rect(canvas, color, pixel_rect, 0)  # Set the third argument to 0 for no anti-aliasing
 
         return canvas
 
@@ -96,8 +103,12 @@ class GridCanvas:
 
         return coord
 
-
     def export_png(self) -> None:
-        fileName : str = f"pypaint_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png"
-        GridCanvas.__CORE__.image.save(self.__get_drawing_for_export(), fileName)
-        self.__send_notification(fileName)
+        file1Name : str = f"pypaint_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}s_50.png"
+        file2Name : str = f"pypaint_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}s_1.png"
+        
+        GridCanvas.__CORE__.image.save_extended(self.__get_drawing_for_export(scale=50), file1Name)
+        GridCanvas.__CORE__.image.save_extended(self.__get_drawing_for_export(scale=1), file2Name)
+        
+        self.__send_notification(os.path.join(os.getcwd(), file1Name))
+        self.__send_notification(os.path.join(os.getcwd(), file2Name))
