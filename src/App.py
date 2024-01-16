@@ -12,8 +12,9 @@ class App():
 
     def __init__(self : "App") -> None:
         App.__CORE__.init()
-        self.activeDrawSate = False
-        self.activeEraseState = False
+        self.font : "pygame.font.Font" = App.__CORE__.font.Font(None, 25)
+        self.activeDrawSate : bool = False
+        self.activeEraseState : bool = False
         self.__WINDOW : "pygame.display"
         self.__MAIN_SURFACE : "pygame.surface.Surface"
         self.__currentSize : Tuple[int] = App.__DEFAULT_WINDOW_SIZE
@@ -34,6 +35,9 @@ class App():
         self.saveButtonSurface = App.__CORE__.image.load("assets/save.png").convert_alpha()
         self.saveButtonSurface = App.__CORE__.transform.scale(self.saveButtonSurface, (40, 40))
         self.saveButtonPosRect = self.drawButtonSurface.get_rect(topleft=(1210, 15))
+
+        self.posIndicatorText = self.font.render(f"X: --, Y: --", False, "black")
+        self.posInicatorRect = self.posIndicatorText.get_rect(topleft=(1080, 740))
 
     def __set_render_components(self : "App") -> None:
         self.__WINDOW = App.__CORE__.display
@@ -78,6 +82,13 @@ class App():
         if self.activeEraseState:
             self.gridCanvas.clear_cell(event.dict["pos"], App.__DEFAULT_WINDOW_COLOR, self.__MAIN_SURFACE)
 
+        col, row = self.gridCanvas.get_coord(event.dict["pos"])
+        if col == -1 or row == -1:
+            col = '--'
+            row = '--'
+        
+        self.posIndicatorText = self.font.render(f"X: {col}, Y: {row}", False, "black")
+
     def __handle_event(self : "App", event : "pygame.event.Event") -> None:
         if event.type == App.__CORE__.QUIT:
             App.__CORE__.quit()
@@ -98,10 +109,13 @@ class App():
             for event in App.__CORE__.event.get():
                 self.__handle_event(event)
 
+            self.__MAIN_SURFACE.fill(App.__DEFAULT_WINDOW_COLOR, App.__CORE__.Rect(*self.posInicatorRect.topleft, 120, 120))
             self.__MAIN_SURFACE.blit(self.eraserButtonSurface, self.eraserButtonPosRect)
             self.__MAIN_SURFACE.blit(self.drawButtonSurface, self.drawButtonPosRect)
             self.__MAIN_SURFACE.blit(self.saveButtonSurface, self.saveButtonPosRect)
+            self.__MAIN_SURFACE.blit(self.posIndicatorText, self.posInicatorRect)
             self.__WINDOW.flip()
+            self.__WINDOW.update()
 
 
 if __name__ == "__main__":
